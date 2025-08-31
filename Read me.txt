@@ -1,0 +1,20 @@
+Step 01 : Connect Postgres SQL Database
+	1) Goto members/settings.py
+	2) Find the word "DATABASES"
+	3) Replace it with this
+			
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'rotary',
+        'USER': 'postgres',
+        'PASSWORD': '1234',
+        'HOST': '127.0.0.1',
+        'PORT': '5432'
+    }
+}
+
+
+
+Step 02
+	Use the Database as usual.
