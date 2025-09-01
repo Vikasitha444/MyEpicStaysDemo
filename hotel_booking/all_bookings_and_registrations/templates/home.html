@@ -1,178 +1,169 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Django MFA App</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="fas fa-shield-alt me-2"></i>Django MFA
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user me-1"></i>{{ user.username }}
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
-                                <li><a class="dropdown-item" href="{% url 'mfa_setup' %}">Security Settings</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'register' %}">Register</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </nav>
+<!-- templates/home.html -->
+{% extends 'base.html' %}
 
-    <!-- Hero Section -->
-    <section class="bg-light py-5">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h1 class="display-4 fw-bold text-primary mb-4">
-                        Secure Your Account with 2FA
-                    </h1>
-                    <p class="lead mb-4">
-                        Protect your account with Multi-Factor Authentication. Add an extra layer of security 
-                        using time-based one-time passwords (TOTP).
-                    </p>
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg me-3">
-                            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
-                        </a>
-                    {% else %}
-                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-3">
-                            <i class="fas fa-sign-in-alt me-2"></i>Login
-                        </a>
-                        <a href="{% url 'register' %}" class="btn btn-outline-primary btn-lg">
-                            <i class="fas fa-user-plus me-2"></i>Register
-                        </a>
-                    {% endif %}
-                </div>
-                <div class="col-lg-6 text-center">
-                    <div class="position-relative">
-                        <i class="fas fa-mobile-alt fa-10x text-primary opacity-75"></i>
-                        <i class="fas fa-shield-alt fa-5x text-success position-absolute top-50 start-50 translate-middle"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+{% block title %}QR Code Verification - Hotel Booking{% endblock %}
 
-    <!-- Features Section -->
-    <section class="py-5">
-        <div class="container">
-            <div class="row text-center mb-5">
-                <div class="col">
-                    <h2 class="h1 fw-bold mb-4">Security Features</h2>
-                    <p class="lead">Advanced security features to protect your account</p>
-                </div>
-            </div>
-            
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <i class="fas fa-qrcode fa-3x text-primary mb-3"></i>
-                            <h4>Easy Setup</h4>
-                            <p class="text-muted">
-                                Simple QR code setup with popular authenticator apps like Google Authenticator or Authy.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+{% block content %}
+<div class="qr-card">
+    <h1 class="qr-title">🏨 QR Code Verification</h1>
+    
+    <div class="instructions">
+        <div class="step">📱 1. Google Authenticator app open කරන්න</div>
+        <div class="step">➕ 2. "+" icon එක press කරන්න</div>
+        <div class="step">📷 3. "Scan a QR code" select කරන්න</div>
+        <div class="step">📱 4. මේ QR code එක scan කරන්න</div>
+        <div class="step">🔢 5. App එකේ show වෙන 6 digit code එක type කරන්න</div>
+    </div>
+    
+    <div class="qr-code-container">
+        <h5 style="color: #666; margin-bottom: 20px;">QR Code Scan කරන්න</h5>
+        <img src="{{ qr_code }}" alt="QR Code" class="qr-code-img">
+    </div>
+    
+    <div class="verification-section">
+        <input 
+            type="text" 
+            id="tokenInput" 
+            class="form-control token-input" 
+            placeholder="6 digit code එක enter කරන්න"
+            maxlength="6"
+            autocomplete="off"
+        >
+        
+        <button 
+            type="button" 
+            id="verifyBtn" 
+            class="btn verify-btn"
+            onclick="verifyToken()"
+        >
+            ✓ Verify Code
+        </button>
+    </div>
+    
+    <div id="alertContainer"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const sessionId = '{{ session_id }}';
+    
+    // Auto-submit when 6 digits entered
+    document.getElementById('tokenInput').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, ''); // Only numbers
+        e.target.value = value;
+        
+        if (value.length === 6) {
+            verifyToken();
+        }
+    });
+    
+    // Enter key submit
+    document.getElementById('tokenInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            verifyToken();
+        }
+    });
+    
+    function verifyToken() {
+        const token = document.getElementById('tokenInput').value;
+        const verifyBtn = document.getElementById('verifyBtn');
+        const alertContainer = document.getElementById('alertContainer');
+        
+        if (!token || token.length !== 6) {
+            showAlert('6 digit code එක enter කරන්න', 'danger');
+            return;
+        }
+        
+        // Disable button during verification
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML = '⏳ Verifying...';
+        
+        // Make AJAX request
+        fetch('/verify-qr/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                session_id: sessionId,
+                token: token
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert(data.message, 'success');
+                document.getElementById('tokenInput').value = '';
                 
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <i class="fas fa-key fa-3x text-success mb-3"></i>
-                            <h4>TOTP Security</h4>
-                            <p class="text-muted">
-                                Time-based One-Time Passwords that change every 30 seconds for maximum security.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                // Add success animation
+                document.querySelector('.qr-card').classList.add('success-animation');
                 
-                <div class="col-md-4">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center p-4">
-                            <i class="fas fa-life-ring fa-3x text-warning mb-3"></i>
-                            <h4>Backup Codes</h4>
-                            <p class="text-muted">
-                                Emergency backup codes ensure you never get locked out of your account.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+                // Reset after animation
+                setTimeout(() => {
+                    document.querySelector('.qr-card').classList.remove('success-animation');
+                }, 600);
+                
+            } else {
+                showAlert(data.message, 'danger');
+                document.getElementById('tokenInput').value = '';
+                document.getElementById('tokenInput').focus();
+            }
+        })
+        .catch(error => {
+            showAlert('Something went wrong. Try again.', 'danger');
+            console.error('Error:', error);
+        })
+        .finally(() => {
+            // Re-enable button
+            verifyBtn.disabled = false;
+            verifyBtn.innerHTML = '✓ Verify Code';
+        });
+    }
+    
+    function showAlert(message, type) {
+        const alertContainer = document.getElementById('alertContainer');
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const icon = type === 'success' ? '✅' : '❌';
+        
+        alertContainer.innerHTML = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                ${icon} ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-        </div>
-    </section>
-
-    <!-- Messages -->
-    {% if messages %}
-        <div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
-            {% for message in messages %}
-                <div class="toast show" role="alert">
-                    <div class="toast-header">
-                        <strong class="me-auto">
-                            {% if message.tags == 'success' %}
-                                <i class="fas fa-check-circle text-success me-1"></i>Success
-                            {% elif message.tags == 'error' %}
-                                <i class="fas fa-exclamation-circle text-danger me-1"></i>Error
-                            {% elif message.tags == 'warning' %}
-                                <i class="fas fa-exclamation-triangle text-warning me-1"></i>Warning
-                            {% else %}
-                                <i class="fas fa-info-circle text-info me-1"></i>Info
-                            {% endif %}
-                        </strong>
-                        <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-                    </div>
-                    <div class="toast-body">{{ message }}</div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    <!-- Footer -->
-    <footer class="bg-dark text-white py-4 mt-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <p>&copy; 2025 Django MFA App. All rights reserved.</p>
-                </div>
-                <div class="col-md-6 text-end">
-                    <p>Built with Django & Bootstrap</p>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+        `;
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            const alert = alertContainer.querySelector('.alert');
+            if (alert) {
+                alert.classList.remove('show');
+                setTimeout(() => {
+                    alertContainer.innerHTML = '';
+                }, 150);
+            }
+        }, 5000);
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Focus on input when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('tokenInput').focus();
+    });
+</script>
+{% endblock %}

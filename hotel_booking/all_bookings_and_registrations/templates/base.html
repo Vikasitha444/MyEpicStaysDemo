@@ -1,0 +1,139 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hotel Booking System{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .qr-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .qr-title {
+            color: #4c63d2;
+            font-weight: 700;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+        
+        .qr-code-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .qr-code-img {
+            max-width: 250px;
+            height: auto;
+            border-radius: 10px;
+        }
+        
+        .token-input {
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 18px;
+            text-align: center;
+            letter-spacing: 2px;
+            font-weight: 600;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .token-input:focus {
+            border-color: #4c63d2;
+            box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+            outline: none;
+        }
+        
+        .verify-btn {
+            background: linear-gradient(135deg, #4c63d2 0%, #6c5ce7 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(76, 99, 210, 0.3);
+        }
+        
+        .verify-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 99, 210, 0.4);
+        }
+        
+        .alert {
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+        
+        .success-animation {
+            animation: successPulse 0.6s ease-in-out;
+        }
+        
+        @keyframes successPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .instructions {
+            background: rgba(76, 99, 210, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #4c63d2;
+        }
+        
+        .step {
+            margin: 10px 0;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        {% block content %}
+        {% endblock %}
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    {% block scripts %}
+    {% endblock %}
+</body>
+</html>

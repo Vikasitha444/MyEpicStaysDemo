@@ -1,129 +1,82 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+# all_bookings_and_registrations/views.py
+
+from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.views import LoginView
-from .models import UserMFA
-from .forms import MFAVerificationForm, CustomAuthenticationForm, MFASetupForm
-from django.contrib.auth.models import User
+from django.utils.decorators import method_decorator
+from .models import QRSession
+import json
+import secrets
 
-def home_view(request):
-    """Home page view"""
-    return render(request, 'home.html')
-
-@login_required
-def dashboard_view(request):
-    """Dashboard view for authenticated users"""
-    user_mfa, created = UserMFA.objects.get_or_create(user=request.user)
+def home_page(request):
+    """Home page with QR code display"""
+    # Generate new session
+    session_id = secrets.token_hex(8)  # 16 character hex string
+    
+    # Create QR session
+    qr_session = QRSession()
+    qr_session.session_id = session_id
+    qr_session.secret_key = qr_session.generate_secret()  # Generate base32 secret
+    qr_session.save()
+    
+    # Generate QR code
+    qr_code_data = qr_session.generate_qr_code()
+    
     context = {
-        'user_mfa': user_mfa,
+        'qr_code': qr_code_data,
+        'session_id': session_id,
     }
-    return render(request, 'dashboard.html', context)
-
-@login_required
-def profile_view(request):
-    """User profile view"""
-    return render(request, 'profile.html')
-
-class CustomLoginView(LoginView):
-    form_class = CustomAuthenticationForm
-    template_name = 'registration/login.html'
     
-    def form_valid(self, form):
-        user = form.get_user()
-        user_mfa, created = UserMFA.objects.get_or_create(user=user)
-        
-        if user_mfa.is_mfa_enabled:
-            # Store user ID in session for MFA verification
-            self.request.session['pre_mfa_user_id'] = user.id
-            return redirect('mfa_verify')
-        else:
-            # Normal login without MFA
-            login(self.request, user)
-            return redirect('dashboard')  # Change to your success URL
+    return render(request, 'home.html', context)
 
-def mfa_verify_view(request):
-    """Verify MFA token during login"""
-    user_id = request.session.get('pre_mfa_user_id')
-    if not user_id:
-        return redirect('login')
-    
-    try:
-        user = User.objects.get(id=user_id)
-        user_mfa = UserMFA.objects.get(user=user)
-    except (User.DoesNotExist, UserMFA.DoesNotExist):
-        return redirect('login')
-    
+@csrf_exempt
+def verify_qr_code(request):
+    """Verify the QR code token"""
     if request.method == 'POST':
-        form = MFAVerificationForm(user=user, data=request.POST)
-        if form.is_valid():
-            # MFA verification successful
-            login(request, user)
-            del request.session['pre_mfa_user_id']  # Clean up session
-            messages.success(request, 'Successfully logged in!')
-            return redirect('dashboard')  # Change to your success URL
-        else:
-            messages.error(request, 'Invalid verification code.')
-    else:
-        form = MFAVerificationForm(user=user)
-    
-    return render(request, 'mfa/verify.html', {'form': form})
-
-@login_required
-def mfa_setup_view(request):
-    """Setup MFA for user account"""
-    user_mfa, created = UserMFA.objects.get_or_create(user=request.user)
-    
-    if request.method == 'POST':
-        form = MFASetupForm(request.POST)
-        if form.is_valid():
-            token = form.cleaned_data['token']
-            if user_mfa.verify_token(token):
-                user_mfa.is_mfa_enabled = True
-                user_mfa.save()
-                messages.success(request, 'MFA has been enabled successfully!')
-                return redirect('mfa_backup_tokens')
+        try:
+            data = json.loads(request.body)
+            session_id = data.get('session_id')
+            token = data.get('token')
+            
+            if not session_id or not token:
+                return JsonResponse({
+                    'success': False, 
+                    'message': 'Session ID සහ Token දෙකම ඕනේ'
+                })
+            
+            # Get QR session
+            try:
+                qr_session = QRSession.objects.get(session_id=session_id, is_verified=False)
+            except QRSession.DoesNotExist:
+                return JsonResponse({
+                    'success': False, 
+                    'message': 'අවලංගු session එකක්'
+                })
+            
+            # Verify token
+            if qr_session.verify_token(token):
+                qr_session.is_verified = True
+                qr_session.save()
+                
+                return JsonResponse({
+                    'success': True, 
+                    'message': 'සාර්ථකයි! QR Code හරියට verify වුනා!'
+                })
             else:
-                messages.error(request, 'Invalid verification code. Please try again.')
-    else:
-        form = MFASetupForm()
-        if not user_mfa.secret_key:
-            user_mfa.generate_secret_key()
+                return JsonResponse({
+                    'success': False, 
+                    'message': 'වැරදි code එකක්. නැවත try කරන්න.'
+                })
+                
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'success': False, 
+                'message': 'Invalid JSON data'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'success': False, 
+                'message': f'Error: {str(e)}'
+            })
     
-    qr_code = user_mfa.get_qr_code()
-    
-    return render(request, 'mfa/setup.html', {
-        'form': form,
-        'qr_code': qr_code,
-        'secret_key': user_mfa.secret_key
-    })
-
-@login_required
-def mfa_backup_tokens_view(request):
-    """Generate and display backup tokens"""
-    user_mfa, created = UserMFA.objects.get_or_create(user=request.user)
-    
-    if request.method == 'POST':
-        backup_tokens = user_mfa.generate_backup_tokens()
-        return render(request, 'mfa/backup_tokens.html', {
-            'backup_tokens': backup_tokens,
-            'show_tokens': True
-        })
-    
-    return render(request, 'mfa/backup_tokens.html')
-
-@login_required
-def mfa_disable_view(request):
-    """Disable MFA for user account"""
-    if request.method == 'POST':
-        user_mfa, created = UserMFA.objects.get_or_create(user=request.user)
-        user_mfa.is_mfa_enabled = False
-        user_mfa.secret_key = ''
-        user_mfa.backup_tokens = []
-        user_mfa.save()
-        messages.success(request, 'MFA has been disabled.')
-        return redirect('profile')  # Change to your profile URL
-    
-    return render(request, 'mfa/disable.html')
+    return JsonResponse({'success': False, 'message': 'POST method එක පමණයි allow'})

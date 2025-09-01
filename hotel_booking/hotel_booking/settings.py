@@ -1,15 +1,18 @@
+# hotel_booking/settings.py
+
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&qv61v&t0hhgvrj*#k8l06gkku3b9bg)dp!i&(4c4x3pn7!!b0'
+SECRET_KEY = 'your-secret-key-here'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
@@ -19,61 +22,28 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    # Required by allauth
-    'django.contrib.sites',
-
-    # Enable allauth
-    'allauth',
-    'allauth.account',
-
-    # Configure the django-otp package
     'django_otp',
-    'django_otp.plugins.otp_totp',
-    'django_otp.plugins.otp_static',
-
-    # Enable two-factor auth
-    'allauth_2fa',
-     'crispy_forms',
+    'qrcode',
+    'all_bookings_and_registrations',
 ]
 
-# Fixed: Use MIDDLEWARE instead of MIDDLEWARE_CLASSES (Django 1.10+)
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    
-    # Required by allauth - this was missing!
-    'allauth.account.middleware.AccountMiddleware',
-    
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
-    # Configure the django-otp package. Note this must be after the
-    # AuthenticationMiddleware.
-    'django_otp.middleware.OTPMiddleware',
-
-    # Reset login flow middleware. If this middleware is included, the login
-    # flow is reset if another page is loaded between login and successfully
-    # entering two-factor credentials.
-    'allauth_2fa.middleware.AllauthTwoFactorMiddleware',
 ]
-
-# Set the allauth adapter to be the 2FA adapter.
-ACCOUNT_ADAPTER = 'allauth_2fa.adapter.OTPAdapter'
-
-# Configure your default site. See
-# https://docs.djangoproject.com/en/dev/ref/settings/#sites.
-SITE_ID = 1
 
 ROOT_URLCONF = 'hotel_booking.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Make sure templates directory exists
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,17 +55,18 @@ TEMPLATES = [
         },
     },
 ]
+
 WSGI_APPLICATION = 'hotel_booking.wsgi.application'
 
 # Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'MyEpicStaysDemoDB',
+        'NAME': 'Tets',
         'USER': 'postgres',
         'PASSWORD': '1234',
-        'HOST': '127.0.0.1',
-        'PORT': '5432'
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -115,63 +86,25 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Allauth settings
-AUTHENTICATION_BACKENDS = [
-    # Needed to login by username in Django admin, regardless of `allauth`
-    'django.contrib.auth.backends.ModelBackend',
-    # `allauth` specific authentication methods, such as login by e-mail
-    'allauth.account.auth_backends.AuthenticationBackend',
-]
-
-# Login/Logout URLs
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
-
-# Allauth account settings
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_USERNAME_REQUIRED = False
-
 # Internationalization
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Colombo'
 USE_I18N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / "static",
 ]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-# Media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-# Crispy Forms
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
-# Login/Logout redirects
-LOGIN_REDIRECT_URL = 'dashboard'
-LOGOUT_REDIRECT_URL = 'home'
-
-# Session settings for MFA
-SESSION_COOKIE_AGE = 3600  # 1 hour
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-# Messages Framework
-from django.contrib.messages import constants as messages
-MESSAGE_TAGS = {
-    messages.DEBUG: 'debug',
-    messages.INFO: 'info',
-    messages.SUCCESS: 'success',
-    messages.WARNING: 'warning',
-    messages.ERROR: 'danger',
-}
+# Django OTP Settings
+OTP_TOTP_ISSUER = 'Hotel Booking System'
