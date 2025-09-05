@@ -29,8 +29,8 @@ def home_page(request): #User Home Page එකට ගියාම වෙන ද�
 
 
 
-#Defulat Django වලට එන, "CSRF protection" එක Disable කිරීමට සහ Display කිරීමට යන, QR Code, එක, Display කිරීමට පෙර, Verify කිරීමට මේ Function එක භාවතා කරයි
-#Verify කරනවා කියලා බලන්නේ, QR Code එකේ, "session_id" එකයි, "Token(TOTP එක)" එකයි තියෙනවද කියලා.
+#Defulat Django වලට එන, "CSRF protection" එක Disable කිරීමට සහ User ඇතුලත් කරන, Token එක, Verify කිරිමට, මෙය භාවිතා කරයි.
+#Verify කරනවා කියලා බලන්නේ, QR Code එකේ, "session_id" එකයි, "Token" එකයි තියෙනවද කියලා.
 
 @csrf_exempt #CSRF protection එක Disable කිරීමට භාවිතා වේ.
 def verify_qr_code(request): # QR code verify function එක වේ
@@ -39,13 +39,13 @@ def verify_qr_code(request): # QR code verify function එක වේ
         try:
             data = json.loads(request.body) # එවපු Request එකේ, JSON Fromat එකෙන් හදපු Data, Python වලට කියවා ගත හැකි ආකාරයට Convert කරගැනීමට භාව්තා කරයි.
             session_id = data.get('session_id') # "session_id" value එක extract කිරීමට භාවිතා කරයි.
-            token = data.get('token') #"token (TOTP එක)" එකේ value එක extract කිරීමට භාවිතා කරයි.
+            token = data.get('token') #"Token" එකේ value එක extract කිරීමට භාවිතා කරයි.
             
-            # Session_id හෝ token (TOTP එක) දෙකෙන් එකක් හරි missing නම්,
+            # Session_id හෝ Token දෙකෙන් එකක් හරි missing නම්,
             if not session_id or not token: 
                 return JsonResponse({
                     'success': False, 
-                    'message': 'Need both Session ID and Token (TOTP)' # Session ID එකයි, Token (TOTP එක) එකයි, දෙකම ඕනේ කියා කියයි.
+                    'message': 'Need both Session ID and Token' # Session ID එකයි, Token එකයි, දෙකම ඕනේ කියා කියයි.
                 })
             
             # එසේ, "Session_id" හෝ "Token" එක යන දෙකම තිබේ නම්,
@@ -57,7 +57,7 @@ def verify_qr_code(request): # QR code verify function එක වේ
                     'message': 'An Invalid Session' #මෙහෙම Display කරන්න
                 })
             
-            # "qr_session" එකේ, "verify_token" Function එකට, Token(TOTP එක) Code එක දැම්මම, ලැබෙන උත්තරේ TRUE නම්,
+            # "qr_session" එකේ, "verify_token" Function එකට, Token() Code එක දැම්මම, ලැබෙන උත්තරේ TRUE නම්,
             if qr_session.verify_token(token):
                 qr_session.is_verified = True   #"is_verified" field එක True වේ
                 qr_session.save()   # QR session එක Database එකට Save වේ.
