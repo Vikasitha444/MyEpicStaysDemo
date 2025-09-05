@@ -21,7 +21,7 @@ class QRSession(models.Model):
     #මේක ඕන වෙන්නේ, QR Code එක හදද්දී, සහ TOTP Code එක හදද්දී
     
     #QR Code එක ඇතුලේ තියෙන්නේ = Secret Key එකක් + Email එක + App Name එක
-    #TOTP Code එක ඇතුලේ තියෙන්නේ = එකම(Same)Secret Key එක + Time එක
+    #TOTP Algoritham එක වැඩ කරන්නේ : Secret Key එක +   Time එක   =     Code
 
     def generate_secret(self): 
         random_bytes = secrets.token_bytes(20) 
@@ -34,7 +34,7 @@ class QRSession(models.Model):
         issuer = "MyEpicStaysDemo" #Google Autheticator එකේ Display වෙන නම
         account_name = f"Enter This Code To Verify" #Google Autheticator එකේ Display වෙන අනිත් නම
         
-        #Time based OTP එකේ, URI (URL) එක, Standerd Format එකට හදනවා.
+        #Time based OTP එකේ, URI (URL) එක, Standard Format එකට හදනවා.
         totp_uri = (f"otpauth://totp/{issuer}:{account_name}"f"?secret={self.secret_key}"f"&issuer={issuer}"f"&algorithm=SHA1"f"&digits=6"f"&period=30")
         
         
@@ -61,8 +61,8 @@ class QRSession(models.Model):
     
 
 
-    #මෙතැනදී, TOTP Key එකක් Genarate කරන්න Function එකක් ලියලා තියෙනවා.
-    #TOTP Code එක ඇතුලේ තියෙන්නේ = එකම(Same)Secret Key එක + Time එක
+    #මෙතැනදී, TOTP Algoritham එක ලියලා තියෙනවා.
+    #TOTP Algoritham එක වැඩ කරන්නේ : Secret Key එක +   Time එක   =     Code
     #මේක අංක 6ක Code එකක්.
     def generate_totp(self, time_step=None): #6-digit time-based code generate කරන්න
         if time_step is None: 
@@ -93,15 +93,21 @@ class QRSession(models.Model):
     
     
     
-    #මෙතැනදී, User විසින් Enter කළ, TOTP Key එක, නිවැරදිද බලන්න, Function එකක් ලියා තිබේ.
+#මෙතැනදී, User විසින් Enter කළ Token එක, නිවැරදිද බලන්න, Function එකක් ලියා තිබේ.
+
+#Verification Process එක වෙන්නේ මෙහෙමයි.
+#QR එක හදන්න ගත්තු, Secret Key එක Database එකේ Save වෙනවා.
+#Django එකෙන්, ඒ Secret Key එකයි, දැන් වෙලාවයි, TOTP කියන Algoritham එකට දාලා, Code එකක් හදනවා.			
+#Google Authenticator App එකෙනුත්, ඒ Secret Key එකයි, දැන් වෙලාවයි, TOTP කියන Algoritham එකට දාලා, Code එකක් හදනවා. 
+#මේ Code දෙකම ගලපුනොත්, Verification එක වෙනවා
     def verify_token(self, token):
         current_time_step = int(time.time()) // 30  #දැන් time එක 30-second intervals වලට වෙන් කරනු ලැබේ.
         
         #User දැන් සිටින Window එක තප්පර ±30 ත් අතර කාලයක් බලා හිඳී.
         for time_step in [current_time_step - 1, current_time_step, current_time_step + 1]:
             try:
-                generated_token = self.generate_totp(time_step) #Time Stamp එක දාලා, මෙතනදීත් TOTP අංකයක් නිර්මාණය කරගනී.
-                if generated_token and generated_token == str(token).strip():  #User Enter කළ, TOTP අංකය සහ දැන් Genarate කරගත් TOTP අංකය, ගැලපේ නම්, 
+                generated_token = self.generate_totp(time_step) #Time Stamp එක දාලා, මෙතනදීත් Token එකක් නිර්මාණය කරගනී.
+                if generated_token and generated_token == str(token).strip():  #User Enter කළ, Key එක සහ දැන් Genarate කරගත් Key එකේ අගය, ගැලපේ නම්, 
                     print(f"Token verified successfully: {generated_token}") #මෙලෙස Print වේ.
                     return True
             except Exception as e:
