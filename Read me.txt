@@ -1,0 +1,137 @@
+* අද මට තියෙන්නේ, Django වලින්,  MFA පිලිබඳ දළ අවබෝධයක් ගන්න. සර් මට කිව්වා AI භාවිතා කරලා මේ ගැන අධ්‍යනය කරන්න කියල.
+
+* මුලින්ම, මම Django වලින්, MFA දාන්න පුළුවන් විවිධ ක්‍රම පිළිබඳව අධ්‍යනය කලා. මේකෙදි මට හම්බවුනා, Libraries කිහිපයක්ම, 
+		"Kagi"
+		"django-two-factor-auth"
+		"django-mfa"
+				වගේ.
+
+* මේකෙන්, ගොඩක්ම, Beginner Friendly Library එක වුනේ, django-mfaයි.  මම මේක ලේසියි කියලා දැනගත්තේ, මේකේ Documentation එක කියෙව්වට පස්සේ. 
+
+* මේ නිසා මම django-mfa කියන Library එක භාවිතා කලා.
+
+
+* මම AI භාවිතා කරලා, Simple Multi factor Authentication Code එකක් ඉල්ලගත්තා, django-mfa කියන Library එක භාවිතයෙන්. 
+
+* "Models.py", "Views.py", "home.html" කියන, files වලට අදාළ වූ, Codes ටික මට ලැබුනා. 
+
+* මේකේ, Models.py එකේ, Database Handle කරන ආකාරයත්, සහ QR Code එකට අදාළ, Functionalities තිබේ.
+
+* මේකේ, Views.py එකේ, Models.py වල Functions භාවිතා කර, QR Code දත්ත, Templates වලට යවන ආකාරය, Handle කර තිබේ.
+
+* Home.html එකේ, QR Code එක හා, Verification Code එක Enter කිරීමට ඉඩ ලබා දී තිබේ.
+
+
+
+* මෙතැනදී, මම ඉගෙනගත්තා, Django වල, MFA Process එක සිදු වෙන Process එක,
+
+	00) QR Code එක හදන්න ඕනේ. {Secret Key + Email + App Name (issuer) දාලා}
+			+ මම Secret Key එකක් හදන විදිහ දැනගත්තා
+					-		Secret Key එකක් හදන්න, Django වල Inbuild Library එකක් තියෙනවා, "secrets" 			කියලා. මේකෙන් කරන්නේ, Secure විදිහට, random numbers generate කරන එක. 			මේකෙන් අපිට Key එක හදාගන්න පුළුවන්.
+
+
+			+මම, QR එකට, issuerගේ, නම දාන විදිහ ඉගෙන ගත්තා
+					-		QR Code එක Scan කලාම, issuerගේ නම, Google Authenticator App එක 
+							උඩින් වැටෙනවා. මේක වෙන්නේ, QR Code එක ඇතුලට, App එකේ නම දාන නිසා. මේ වෙනස් කරන විදිහ මම ඉගෙන ගත්තා.
+
+
+			+ පස්සේ, මේ Data ඔක්කොම දාලා, QR Code එකක් හදලා, QR එක, Base64 වලින් Encode කරලා, QR එක String එකක් බවට පත් කරලා, ඒක home.html කියන tempalte එකට යවන විදිහ මම ඉගෙන ගත්තා.
+
+	00) QR Code එක Scan කරන්න ඕනේ,
+	
+	00) QR එක, Google Authenticator, Auter වගේ, App එකක් භාවිතයෙන් Scan කරන්න ඕනේ.
+			- මෙහෙම, Scan කරනකොට, TOTP එකක්, Google Authenticator App එකෙන් පෙන්වනවා. 
+
+	00) ඊට පස්සේ Google Authenticator එකේ, පෙන්වන, Code එක, Type කරන්න ඕනේ.
+			-  මේක, home.html එකේ, Verification Code එක ඉල්ලන තැනට දුන්නම,
+
+	00) Verify කරන්න ඕනේ
+			- QR එක හදන්න ගත්තු, Secret Key එක Database එකේ Save වෙනවා.
+
+			- Django එකෙන්, ඒ Secret Key එකයි, දැන් වෙලාවයි, TOTP කියන Algoritham එකට දාලා, Code එකක් හදනවා.
+			
+			- Google Authenticator App එකෙනුත්, ඒ Secret Key එකයි, දැන් වෙලාවයි, TOTP කියන Algoritham එකට දාලා, Code එකක් හදනවා. 
+
+			 
+			- මේ Code දෙකම ගලපුනොත්, Verification එක වෙනවා
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------------------------------
+* අද මට තියෙන්නේ, Django වලින්,  MFA පිලිබඳ දළ අවබෝධයක් ගන්න. සර් මට කිව්වා AI භාවිතා කරලා මේ ගැන අධ්‍යනය කරන්න කියල.
+
+* මුලින්ම, මම Django වලින්, MFA දාන්න පුළුවන් විවිධ ක්‍රම පිළිබඳව අධ්‍යනය කලා. මේකෙදි මට හම්බවුනා, Libraries කිහිපයක්ම, 
+		"Kagi"
+		"django-two-factor-auth"
+		"django-mfa"
+				වගේ.
+
+* මේකෙන්, ගොඩක්ම, Beginner Friendly Library එක වුනේ, django-mfaයි.  මම මේක ලේසියි කියලා දැනගත්තේ, මේකේ Documentation එක කියෙව්වට පස්සේ. 
+
+* මේ නිසා මම django-mfa කියන Library එක භාවිතා කලා.
+
+
+* මම AI භාවිතා කරලා, Simple Multi factor Authentication Code එකක් ඉල්ලගත්තා, django-mfa කියන Library එක භාවිතයෙන්. 
+
+* "Models.py", "Views.py", "home.html" කියන, files වලට අදාළ වූ, Codes ටික මට ලැබුනා. 
+
+* මේකේ, Models.py එකේ, Database Handle කරන ආකාරයත්, සහ QR Code එකට අදාළ, Functionalities තිබේ.
+
+* මේකේ, Views.py එකේ, Models.py වල Functions භාවිතා කර, QR Code දත්ත, Templates වලට යවන ආකාරය, Handle කර තිබේ.
+
+* Home.html එකේ, QR Code එක හා, Verification Code එක Enter කිරීමට ඉඩ ලබා දී තිබේ.
+
+
+
+* මෙතැනදී, මම ඉගෙනගත්තා, Django වල, MFA Process එක සිදු වෙන Process එක,
+
+	00) QR Code එක හදන්න ඕනේ. {Secret Key + Email + App Name (issuer) දාලා}
+			+ මම Secret Key එකක් හදන විදිහ දැනගත්තා
+					-		Secret Key එකක් හදන්න, Django වල Inbuild Library එකක් තියෙනවා, "secrets" 			කියලා. මේකෙන් කරන්නේ, Secure විදිහට, random numbers generate කරන එක. 			මේකෙන් අපිට Key එක හදාගන්න පුළුවන්.
+
+
+			+මම, QR එකට, issuerගේ, නම දාන විදිහ ඉගෙන ගත්තා
+					-		QR Code එක Scan කලාම, issuerගේ නම, Google Authenticator App එක 
+							උඩින් වැටෙනවා. මේක වෙන්නේ, QR Code එක ඇතුලට, App එකේ නම දාන නිසා. මේ වෙනස් කරන විදිහ මම ඉගෙන ගත්තා.
+
+
+			+ පස්සේ, මේ Data ඔක්කොම දාලා, QR Code එකක් හදලා, QR එක, Base64 වලින් Encode කරලා, QR එක String එකක් බවට පත් කරලා, ඒක home.html කියන tempalte එකට යවන විදිහ මම ඉගෙන ගත්තා.
+
+	00) QR Code එක Scan කරන්න ඕනේ,
+	
+	00) QR එක, Google Authenticator, Auter වගේ, App එකක් භාවිතයෙන් Scan කරන්න ඕනේ.
+			- මෙහෙම, Scan කරනකොට, TOTP එකක්, Google Authenticator App එකෙන් පෙන්වනවා. 
+
+	00) ඊට පස්සේ Google Authenticator එකේ, පෙන්වන, Code එක, Type කරන්න ඕනේ.
+			-  මේක, home.html එකේ, Verification Code එක ඉල්ලන තැනට දුන්නම,
+
+	00) Verify කරන්න ඕනේ
+			- QR එක හදන්න ගත්තු, Secret Key එක Database එකේ Save වෙනවා.
+			- QR එක Scan කලාට පස්සේ, Google Authenticator එකේ, TOTP code එකක් Genarate වෙනවා.
+			- Server එකේත් same secret key එක use කරලා same time එකට code generate කරනවා
+			- 
+	
+
+* එකේදී මම ඉගෙන ගත්තා, TOTP එකක් කියන්නේ මොකද්ද කියලා:
+	- TOTP එකක් කියන්නේ, Time Based OTP එකක්. 
+	- මේක, කාලයත් සමඟ වෙනස් වෙනවා.
+
+
