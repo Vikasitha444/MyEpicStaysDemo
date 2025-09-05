@@ -1,19 +1,17 @@
 from django.shortcuts import render  # Django වල HTML templates return කරන්න භාවිතා කරයි
 from django.http import JsonResponse # JSON responses යවන්න භාවිතා කරයි
 from django.views.decorators.csrf import csrf_exempt # CSRF protection disable කරන්න decorator එක import කරනවා
-from django.utils.decorators import method_decorator #Remove this line
 from .models import QRSession # "models.py" file එකේ "QRSession model" එක import කිරීමට භාවිතා කරයි
 import json # JSON data handle කරන්න භාවිතා කරයි
 import secrets #Django වල Secure විදිහට, random numbers generate කරන්න භාවිතා කරයි
 
 def home_page(request): #User Home Page එකට ගියාම වෙන දේ මෙතන Handle කරයි
-    #Meka 16 weni line eken pahalata geniyanna
-    session_id = secrets.token_hex(8)  # 8 bytes hexadecimal token එකක් generate කරනවා (length එක 16 characters)
-    
     
     qr_session = QRSession() #QR Session Function එකට Call කර, "QR Session()"" වෙනුවට, "qr_session" නමට භාවිතයේ පහසුවට ආදේශ කිරීමට භාවිතා කරයි
     
     #QR session එක Genarate කිරීමට, Function එකට, අදාළ වූ, දත්ත මෙතනින් ලබා දෙනු ලැබේ
+    session_id = secrets.token_hex(8)  # 8 bytes hexadecimal token එකක් generate කරනවා (length එක 16 characters)
+    
     qr_session.session_id = session_id #Generate කරපු session_id එක assign කිරීමට භාවිතා කරයි
     qr_session.secret_key = qr_session.generate_secret()  #secret key එක generate කිරීමට භාවිතා කරයි
     qr_session.save() #QR session එක save කරනවා
