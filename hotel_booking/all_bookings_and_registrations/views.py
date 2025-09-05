@@ -45,7 +45,7 @@ def verify_qr_code(request): # QR code verify function එක වේ
             if not session_id or not token: 
                 return JsonResponse({
                     'success': False, 
-                    'message': 'Session ID සහ Token  දෙකම ඕනේ' # Session ID එකයි, Token (TOTP එක) එකයි, දෙකම ඕනේ කියා කියයි.
+                    'message': 'Need both Session ID and Token (TOTP)' # Session ID එකයි, Token (TOTP එක) එකයි, දෙකම ඕනේ කියා කියයි.
                 })
             
             # එසේ, "Session_id" හෝ "Token" එක යන දෙකම තිබේ නම්,
@@ -54,7 +54,7 @@ def verify_qr_code(request): # QR code verify function එක වේ
             except QRSession.DoesNotExist: #"QR Session()" කියන Function එකම නැත්නම්,
                 return JsonResponse({
                     'success': False, 
-                    'message': 'අවලංගු session එකක්' #මෙහෙම Display කරන්න
+                    'message': 'An Invalid Session' #මෙහෙම Display කරන්න
                 })
             
             # "qr_session" එකේ, "verify_token" Function එකට, Token(TOTP එක) Code එක දැම්මම, ලැබෙන උත්තරේ TRUE නම්,
@@ -64,12 +64,12 @@ def verify_qr_code(request): # QR code verify function එක වේ
                 
                 return JsonResponse({
                     'success': True, 
-                    'message': 'සාර්ථකයි! QR Code හරියට verify වුනා!' # Success JSON response එකක් return කරනවා
+                    'message': 'Success! The QR Code has been verified' # Success JSON response එකක් return කරනවා
                 })
             else:
                 return JsonResponse({
                     'success': False, 
-                    'message': 'වැරදි code එකක්. නැවත try කරන්න.'
+                    'message': 'Invalid Code. Try again.'
                 })
                 
         except json.JSONDecodeError:
@@ -83,4 +83,4 @@ def verify_qr_code(request): # QR code verify function එක වේ
                 'message': f'Error: {str(e)}'
             })
     
-    return JsonResponse({'success': False, 'message': 'POST method එක පමණයි allow'})
+    return JsonResponse({'success': False, 'message': 'Only the POST Methord is allowd'})
